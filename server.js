@@ -35,8 +35,41 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+const bodyParser = require('body-parser');
+
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Liste des rôles proposés (à adapter selon ton serveur)
+const availableRoles = [
+  { id: '1385369641853128865', name: 'Rôle PACA' },
+  { id: '1385369762766520430', name: 'Rôle TGV' },
+  { id: '1385369852277162044', name: 'Rôle autre' },
+];
+
 app.get('/', (req, res) => {
-  res.render('home', { user: req.user });
+  res.render('home', { user: req.user, roles: availableRoles });
+});
+
+app.post('/assign-roles', async (req, res) => {
+  if (!req.user) return res.redirect('/');
+
+  // req.body.roles peut être un string ou un tableau si plusieurs sélectionnés
+  const rolesToAdd = Array.isArray(req.body.roles) ? req.body.roles : [req.body.roles];
+
+  try {
+    const guild = await client.guilds.fetch(process.env.GUILD_ID);
+    const member = await guild.members.fetch(req.user.id);
+
+    for (const roleId of rolesToAdd) {
+      if (availableRoles.find(r => r.id === roleId)) {
+        await member.roles.add(roleId);
+      }
+    }
+    res.send('✅ Rôles attribués avec succès !');
+  } catch (e) {
+    console.error(e);
+    res.send('❌ Une erreur est survenue.');
+  }
 });
 
 app.get('/login', passport.authenticate('discord'));
