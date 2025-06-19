@@ -90,6 +90,14 @@ app.get('/callback', passport.authenticate('discord', { failureRedirect: '/' }),
 app.get('/success', (req, res) => res.send('✅ Rôle attribué avec succès.'));
 app.get('/error', (req, res) => res.send('❌ Erreur lors de l’attribution du rôle.'));
 
+app.get('/logout', (req, res) => {
+  req.logout(() => {
+    // Après déconnexion, redirige vers la page d'accueil
+    res.redirect('/');
+  });
+});
+
+
 client.login(process.env.BOT_TOKEN).then(() => {
   app.listen(process.env.PORT || 3000, () => {
     console.log('🌍 Site lancé avec attribution de rôle');

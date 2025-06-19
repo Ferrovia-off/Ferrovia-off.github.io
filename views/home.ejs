@@ -13,7 +13,7 @@
       <button>Se connecter avec Discord</button>
     </a>
   <% } else { %>
-    <p>Connecté en tant que <%= user.username %>#<%= user.discriminator %></p>
+    <p>Connecté en tant que <%= user.username %></p>
     <form action="/assign-roles" method="POST">
       <% roles.forEach(role => { %>
         <label>
@@ -23,6 +23,12 @@
       <% }) %>
       <input type="submit" value="Valider" />
     </form>
-  <% } %>
+  <br />
+  <a href="/logout">
+    <button style="margin-top: 20px; background-color: #ff5555; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+      Déconnexion
+    </button>
+  </a>
+<% } %>
 </body>
 </html>
