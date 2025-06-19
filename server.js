@@ -102,7 +102,7 @@ app.get('/callback', passport.authenticate('discord', { failureRedirect: '/' }),
     await guild.members.add(req.user.id, { accessToken: req.user.accessToken });
     const member = await guild.members.fetch(req.user.id);
     await member.roles.add(process.env.ROLE_ID);
-    res.redirect('/success');
+    res.redirect('/roles');
   } catch (e) {
     console.error(e);
     res.redirect('/error');
