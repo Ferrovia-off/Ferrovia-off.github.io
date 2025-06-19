@@ -46,32 +46,6 @@ const availableRoles = [
   { id: '1385369852277162044', name: 'Rôle autre' },
 ];
 
-app.get('/', (req, res) => {
-  res.render('home', { user: req.user, roles: availableRoles });
-});
-
-app.post('/assign-roles', checkAuth, async (req, res) => {
-  if (!req.user) return res.redirect('/');
-
-  // req.body.roles peut être un string ou un tableau si plusieurs sélectionnés
-  const rolesToAdd = Array.isArray(req.body.roles) ? req.body.roles : [req.body.roles];
-
-  try {
-    const guild = await client.guilds.fetch(process.env.GUILD_ID);
-    const member = await guild.members.fetch(req.user.id);
-
-    for (const roleId of rolesToAdd) {
-      if (availableRoles.find(r => r.id === roleId)) {
-        await member.roles.add(roleId);
-      }
-    }
-    res.send('✅ Rôles attribués avec succès !');
-  } catch (e) {
-    console.error(e);
-    res.send('❌ Une erreur est survenue.');
-  }
-});
-
 // Middleware simple pour vérifier si l'utilisateur est connecté
 function checkAuth(req, res, next) {
   if (req.isAuthenticated && req.isAuthenticated()) {
@@ -94,13 +68,41 @@ app.get('/roles', checkAuth, (req, res) => {
   res.render('roles', { user: req.user, roles: availableRoles });
 });
 
+app.get('/', (req, res) => {
+  res.render('home', { user: req.user, roles: availableRoles });
+});
+
+app.post('/assign-roles', async (req, res) => {
+  if (!req.user) return res.redirect('/');
+
+  // req.body.roles peut être un string ou un tableau si plusieurs sélectionnés
+  const rolesToAdd = Array.isArray(req.body.roles) ? req.body.roles : [req.body.roles];
+
+  try {
+    const guild = await client.guilds.fetch(process.env.GUILD_ID);
+    const member = await guild.members.fetch(req.user.id);
+
+    for (const roleId of rolesToAdd) {
+      if (availableRoles.find(r => r.id === roleId)) {
+        await member.roles.add(roleId);
+      }
+    }
+    res.send('✅ Rôles attribués avec succès !');
+  } catch (e) {
+    console.error(e);
+    res.send('❌ Une erreur est survenue.');
+  }
+});
+
+app.get('/login', passport.authenticate('discord'));
+
 app.get('/callback', passport.authenticate('discord', { failureRedirect: '/' }), async (req, res) => {
   try {
     const guild = await client.guilds.fetch(process.env.GUILD_ID);
     await guild.members.add(req.user.id, { accessToken: req.user.accessToken });
     const member = await guild.members.fetch(req.user.id);
     await member.roles.add(process.env.ROLE_ID);
-    res.redirect('/roles');
+    res.redirect('/success');
   } catch (e) {
     console.error(e);
     res.redirect('/error');
