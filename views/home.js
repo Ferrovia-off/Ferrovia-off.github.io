@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Choix de rôle Discord</title>
+</head>
+<body>
+  <h1>Bienvenue sur le serveur !</h1>
+  <% if (!user) { %>
+    <a href="/login">
+      <button>Se connecter avec Discord</button>
+    </a>
+  <% } else { %>
+    <p>Connecté en tant que <%= user.username %>#<%= user.discriminator %></p>
+    <p>Ton rôle est en cours d’attribution...</p>
+  <% } %>
+</body>
+</html>
