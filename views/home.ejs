@@ -6,14 +6,23 @@
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-  <h1>Bienvenue sur le serveur !</h1>
+  <h1>Choisis tes rôles</h1>
+
   <% if (!user) { %>
     <a href="/login">
       <button>Se connecter avec Discord</button>
     </a>
   <% } else { %>
     <p>Connecté en tant que <%= user.username %>#<%= user.discriminator %></p>
-    <p>Ton rôle est en cours d’attribution...</p>
+    <form action="/assign-roles" method="POST">
+      <% roles.forEach(role => { %>
+        <label>
+          <input type="checkbox" name="roles" value="<%= role.id %>" />
+          <%= role.name %>
+        </label>
+      <% }) %>
+      <input type="submit" value="Valider" />
+    </form>
   <% } %>
 </body>
 </html>
