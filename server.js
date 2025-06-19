@@ -29,6 +29,8 @@ passport.deserializeUser((obj, done) => done(null, obj));
 app.use(session({ secret: 'random_secret', resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(express.static('public'));
+
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
