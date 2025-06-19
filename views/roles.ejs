@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Choix de rôles Discord</title>
+</head>
+<body>
+  <h1>Choisis tes rôles, <%= user.username %>!</h1>
+  <form action="/assign-roles" method="POST">
+    <% roles.forEach(role => { %>
+      <label>
+        <input type="checkbox" name="roles" value="<%= role.id %>" />
+        <%= role.name %>
+      </label>
+      <br />
+    <% }) %>
+    <input type="submit" value="Valider" />
+  </form>
+  <br />
+  <a href="/logout">Déconnexion</a>
+</body>
+</html>

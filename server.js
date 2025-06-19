@@ -50,7 +50,7 @@ app.get('/', (req, res) => {
   res.render('home', { user: req.user, roles: availableRoles });
 });
 
-app.post('/assign-roles', async (req, res) => {
+app.post('/assign-roles', checkAuth, async (req, res) => {
   if (!req.user) return res.redirect('/');
 
   // req.body.roles peut être un string ou un tableau si plusieurs sélectionnés
@@ -72,7 +72,27 @@ app.post('/assign-roles', async (req, res) => {
   }
 });
 
-app.get('/login', passport.authenticate('discord'));
+// Middleware simple pour vérifier si l'utilisateur est connecté
+function checkAuth(req, res, next) {
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/login');  // sinon, redirige vers login Discord
+}
+
+// Page d’accueil redirige vers login si non connecté, sinon vers choix rôles
+app.get('/', (req, res) => {
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
+    res.redirect('/login');
+  } else {
+    res.redirect('/roles');
+  }
+});
+
+// Route protégée qui affiche le formulaire de choix des rôles
+app.get('/roles', checkAuth, (req, res) => {
+  res.render('roles', { user: req.user, roles: availableRoles });
+});
 
 app.get('/callback', passport.authenticate('discord', { failureRedirect: '/' }), async (req, res) => {
   try {
@@ -80,7 +100,7 @@ app.get('/callback', passport.authenticate('discord', { failureRedirect: '/' }),
     await guild.members.add(req.user.id, { accessToken: req.user.accessToken });
     const member = await guild.members.fetch(req.user.id);
     await member.roles.add(process.env.ROLE_ID);
-    res.redirect('/success');
+    res.redirect('/roles');
   } catch (e) {
     console.error(e);
     res.redirect('/error');
